@@ -172,7 +172,7 @@ def encode_veh(data, camArr):
 def encode_veh_ud(data):
     IND_POS = 5
     IND_FID = 1
-    IND_CAM_ID = 18
+    IND_CAM_ID = 2
     IND_LANE_ID = 13
     IND_US_FLAG = 21
 
