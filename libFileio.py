@@ -59,14 +59,18 @@ def save_ngsim_data_step2(data, stopInfoAll, timePeriod, camId, lnId, note='step
     print('Saved to ' + fileDir + fileName)
 
 
-def load_data(fileName, scalePos=True):
+def load_data(fileName, unit='pixel'):
     data = np.array(scipy.io.loadmat(fileName)['data'])
-    if scalePos:
+    if unit == 'pixel':
         data[:,5] = data[:,5] * 0.248 / 3.2808 # convert pixel to meter
-        print('Data position are scaled by pixel ratio and converted to meter')
-    else:
+        print('Data position converted from [px] to [m]')
+    elif unit == 'meter':
+        print('Data position already in [m]]')
+    elif unit == 'foot':
         data[:,5] = data[:,5] / 3.2808 # convert pixel to meter
-        print('Data position are ONLY converted to meter')
+        print('Data position converted from [ft] to [m]')
+    else:
+        raise NameError('input unit shall be one of "pixel", "foot", "meter"')
 
     return data
 
