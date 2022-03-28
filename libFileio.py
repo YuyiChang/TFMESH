@@ -106,33 +106,33 @@ def save_data(data, fileDir, fileName, varName):
 def get_veh(data, vid):
     return data[data[:,0]==vid, :]
 
-def encode_veh(data, camArr):
-    IND_POS = 5
-    IND_FID = 1
-    IND_CAM_ID = 18
-    IND_LANE_ID = 13
+# def encode_veh(data, camArr):
+#     IND_POS = 5
+#     IND_FID = 1
+#     IND_CAM_ID = 18
+#     IND_LANE_ID = 13
     
-    vid = data[0,0]
+#     vid = data[0,0]
 
-    fidStart = int(data[0,IND_FID])
-    fidEnd = int(data[-1,IND_FID])
-    numFrame = fidEnd - fidStart + 1
+#     fidStart = int(data[0,IND_FID])
+#     fidEnd = int(data[-1,IND_FID])
+#     numFrame = fidEnd - fidStart + 1
 
-    fidArr = np.arange(fidStart, fidEnd+1)
-    posMat = np.empty((numFrame, 4))
-    posMat[:] = np.nan
-    lnMat = posMat.copy()
+#     fidArr = np.arange(fidStart, fidEnd+1)
+#     posMat = np.empty((numFrame, 4))
+#     posMat[:] = np.nan
+#     lnMat = posMat.copy()
 
-    for i, camId in enumerate(camArr):
-        indThisCam = np.where(data[:,IND_CAM_ID] == camId)[0]
-        fidThisCam = data[indThisCam, 1]
+#     for i, camId in enumerate(camArr):
+#         indThisCam = np.where(data[:,IND_CAM_ID] == camId)[0]
+#         fidThisCam = data[indThisCam, 1]
 
-        indInsert = np.add(fidThisCam, -fidStart).astype('int')
-        posMat[indInsert, i] = data[indThisCam, IND_POS]
-        lnMat[indInsert, i] = data[indThisCam, IND_LANE_ID]
+#         indInsert = np.add(fidThisCam, -fidStart).astype('int')
+#         posMat[indInsert, i] = data[indThisCam, IND_POS]
+#         lnMat[indInsert, i] = data[indThisCam, IND_LANE_ID]
 
-    return posMat, lnMat
-    # posMat = np.zeros()
+#     return posMat, lnMat
+#     # posMat = np.zeros()
 
 
 def show_veh(dataVeh):
