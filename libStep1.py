@@ -284,7 +284,7 @@ def encode_veh_ud(data):
 
 #     return dataTemp
 
-
+# entry point
 def combine_cam_motion_est_ud(dataVeh):
     dt = 0.1
     
