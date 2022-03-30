@@ -20,7 +20,9 @@ This package performs the following tasks:
 
 ### System requirement
 
-Packaged required in this project is listed in `requirements.txt`.
+Packaged required in this project is listed in `requirements.txt`. 
+It is recommended to use Anaconda distribution as most packages are already self-contained.
+The only exception is `filterpy` which can be installed by running `pip install filterpy`.
 
 The code is developed using Python 3.8.3, but should be working on most modern Python releases.
 
