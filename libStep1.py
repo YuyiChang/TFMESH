@@ -17,7 +17,7 @@ def ignore_select_vid(data, vidList):
         ind = (data[:,0] != vid) & ind
     return ind
 
-
+# Initialize a Kalman filter using Constant Acceleration motion model
 def init_ca(dt, std):
     ca = KalmanFilter(dim_x=3, dim_z=1)
     ca.x = np.array([0., 0., 0.])
@@ -30,7 +30,7 @@ def init_ca(dt, std):
     ca.H = np.array([[1., 0, 0]])
     return ca
 
-
+# Initialize velocity (2nd state) value
 def est_init_v(frame, pos, dt):
     z = np.polyfit(dt*frame[0:9], pos[0:9], 1)
     return z[0]
@@ -51,7 +51,7 @@ def measurement_noise_model(pos):
     return x
 
 
-# reorganize time-space data
+# Depreciated: use encode_veh_ud()
 def reorganize_uncombine_pos(dataVeh):
 
     initFrame = np.amin(dataVeh[:, 1])
@@ -75,7 +75,7 @@ def reorganize_uncombine_pos(dataVeh):
 
     return orgPos, isDetection
 
-
+# Visualization utility
 def reset_ax_lim(dataVeh, lb, ub):
     ind = (dataVeh[:,5] > lb) & (dataVeh[:,5] < ub)
     fidArrSel = dataVeh[ind, 1]
@@ -88,9 +88,9 @@ def reset_ax_lim(dataVeh, lb, ub):
 
     return 1
 
-
+# Depreciated: use combine_cam_motion_est_ud instead
 def combine_cam_vehicle_data(data, vid):
-    warnings.warn("deprecated: use combine_cam_motion_est() instead", DeprecationWarning)
+    warnings.warn("deprecated: use combine_cam_motion_est_ud() instead", DeprecationWarning)
     dt = 0.1
     dataVeh = data[data[:,0]==vid, :]
     camIdArr = np.unique(dataVeh[:, 18])
@@ -136,7 +136,7 @@ def combine_cam_vehicle_data(data, vid):
 
     return dataTemp
 
-
+# Depreciated: use encode_veh_ud()
 def encode_veh(data, camArr):
     IND_POS = 5
     IND_FID = 1
@@ -169,6 +169,9 @@ def encode_veh(data, camArr):
     return posMat, lnMat, fidArr
 
 
+# Prepare time series position data for fusing
+# Finding avaliable position samples at given time that come from different camera, lane, or part of vehicle being tracked
+# E.g., camera handoff, front/rear handoff, LCV handling
 def encode_veh_ud(data):
     IND_POS = 5
     IND_FID = 1
@@ -235,56 +238,9 @@ def encode_veh_ud(data):
         else:
             lnArr[i] = lnArr[i-1]
     return posMat, lnArr, fidArr, lnMat
-        
 
-# def combine_cam_motion_est(dataVeh, isUpstream=True):
-#     # use this only for d/s u/s seperated data
-#     dt = 0.1
-#     if isUpstream:
-#         camArr = np.arange(1,5)
-#     else:
-#         camArr = np.arange(4,8)
-    
-#     posMat, lnMat, fidArr = encode_veh(dataVeh, camArr)
-#     numFrame = len(fidArr)
-#     isDetection = np.logical_not(np.isnan(posMat))
-
-#     initV = est_init_v(dataVeh[:,1], dataVeh[:,5], dt)
-#     cafilter = init_ca(dt, 0.02) # 0.005, 0.08
-#     cafilter.x = np.array([dataVeh[0,5], initV, 0])
-
-#     xs_k = []
-#     cov = np.zeros((numFrame, 3, 3))
-
-#     R_history = []
-
-#     for i in range(numFrame):
-#         cafilter.predict()
-#         cafilter.R = measurement_noise_model(cafilter.x[0])
-#         for j in range(len(camArr)):
-#             if isDetection[i, j]:
-#                 cafilter.update(posMat[i, j])
-#         xs_k.append(cafilter.x)
-#         cov[i,:,:] = cafilter.P
-
-#         R_history.append(cafilter.R)
-
-#     xs_k = np.array(xs_k)
-#     xs_rts, _, _, _ = cafilter.rts_smoother(xs_k, cov)
-
-#     dataTemp = np.empty((numFrame, 18))
-#     dataTemp.fill(0)
-
-#     dataTemp[:,0] = dataVeh[0,0]
-#     dataTemp[:,1] = fidArr
-#     dataTemp[:,5] = xs_rts[:,0]
-#     dataTemp[:,11] = xs_rts[:,1]
-#     dataTemp[:,12] = xs_rts[:,2]
-#     dataTemp[:,13] = get_lane_id(dataVeh)
-
-#     return dataTemp
-
-
+# Entry point of motion estimation
+# Perform motion estmation and trajectory fusing using RTS smoother
 def combine_cam_motion_est_ud(dataVeh):
     dt = 0.1
     
@@ -328,7 +284,8 @@ def combine_cam_motion_est_ud(dataVeh):
 
     return dataTemp
 
-
+# Debug version of combine_cam_motion_est_ud()
+# Use combine_cam_motion_est_ud() for production
 def combine_cam_motion_est_ud_logging(dataVeh):
     dt = 0.1
     
@@ -374,7 +331,7 @@ def combine_cam_motion_est_ud_logging(dataVeh):
 
     return dataTemp, cov, covRts, likehood
 
-
+# Depreciated: this feature has moved under encode_veh_ud()
 def get_lane_id(dataVeh):
     initFrame = np.amin(dataVeh[:, 1])
     lastFrame = np.amax(dataVeh[:, 1])
@@ -382,18 +339,6 @@ def get_lane_id(dataVeh):
     numFrame = int(lastFrame - initFrame + 1)
 
     frameArr = np.arange(initFrame, lastFrame+1)
-
-    # lnInfo = dataVeh[0, 13] * np.ones((int(numFrame), ))
-
-    # lnIdDiff = np.diff(dataVeh[:, 13])
-    # lnChangeInd = np.where(lnIdDiff != 0)[0]
-    # lnChangeInd = np.append(lnChangeInd, len(dataVeh[:, 13])-1)
-
-    # if len(lnChangeInd) > 0:
-    #     lastInd = int(0)
-    #     for i, ind in enumerate(lnChangeInd):
-    #         lnInfo[lastInd:ind] = dataVeh[ind, 13]
-    #         lastInd = ind+1
 
     lnInfo = np.zeros(len(frameArr),)
     indLn = np.nonzero(dataVeh[:, 13])[0][0]
@@ -413,10 +358,9 @@ def get_lane_id(dataVeh):
             lnInfo[i] = dataVeh[ind, 13]
             lastLane = dataVeh[ind, 13]
 
-    # print(lnInfo)
-
     return lnInfo
 
+# Depreciated: use combine_cam_motion_est_ud()
 def motion_est(t, x, v, a):
     dt = 0.2
     numFrame = len(t)

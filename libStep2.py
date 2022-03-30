@@ -3,6 +3,7 @@ import time
 from scipy.interpolate import interp1d
 from scipy import interpolate
 
+# Helper utility: find the start and ending points of continued logic true elements
 def index_true_region(ind):
     indBreak = np.logical_xor(ind[1:], ind[:-1])
     indBreakRs = np.where(indBreak)[0]
@@ -16,6 +17,7 @@ def index_true_region(ind):
 
     return indBreakRs[::2]+1, indBreakRs[::-2][::-1]
 
+# Finding frame ID and position when vehicle is stopped
 def index_stop_region(indNsStart, indNsEnd, indStop, vid):
     indStopStart, indStopEnd = np.zeros(len(indNsStart)), np.zeros(len(indNsStart))
     isStopped = True
@@ -41,7 +43,6 @@ def index_stop_region(indNsStart, indNsEnd, indStop, vid):
         indNsStart = indNsStart[isValid].astype(int)
         indNsEnd = indNsEnd[isValid].astype(int)
 
-#         stopInfo = np.array([])
         stopInfo = np.vstack((np.ones((1,np.sum(isValid))) * vid, indNsStart, indStopStart, indStopEnd, indNsEnd))
         stopInfo = stopInfo.transpose().astype(int)
 
@@ -51,7 +52,7 @@ def index_stop_region(indNsStart, indNsEnd, indStop, vid):
 
     return isStopped, stopInfo
 
-
+# Connect moving and stopped parts with cubic spline
 def spline_near_stop(stopInfo, dataVeh):
     def seg_spline_cubic2(x, y, xq):
         f = interp1d(x, y, kind='cubic')
@@ -86,6 +87,7 @@ def spline_near_stop(stopInfo, dataVeh):
 
     return data
 
+# Depreciated: use spline_near_stop()
 def spline_near_stop_der(stopInfo, dataVeh):
     # def seg_spline_cubic(x, y, xq):
     #     tck = interpolate.splrep(x, y, s=0)
@@ -129,9 +131,7 @@ def spline_near_stop_der(stopInfo, dataVeh):
 
     return data
 
-# def spline_full()
-
-
+# Entry point for stop detection and handling
 def ns_and_s_handle(dataVeh):
     # find simular position
     indSame = np.append(np.abs(dataVeh[1:, 5] - dataVeh[:-1, 5]) < 0.01, False)
