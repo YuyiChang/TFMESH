@@ -4,6 +4,7 @@ from filterpy.kalman import KalmanFilter
 from filterpy.common import Q_discrete_white_noise
 from datetime import date
 import warnings
+import configparser
 
 import numba
 from numba import jit
@@ -172,13 +173,23 @@ def encode_veh(data, camArr):
 # Prepare time series position data for fusing
 # Finding avaliable position samples at given time that come from different camera, lane, or part of vehicle being tracked
 # E.g., camera handoff, front/rear handoff, LCV handling
-def encode_veh_ud(data):
-    IND_POS = 5
-    IND_FID = 1
-    IND_CAM_ID = 2 # NGSIM from Lizhe
-    # IND_CAM_ID = 18 # for 3D LiDAR data
-    IND_LANE_ID = 13
-    IND_US_FLAG = 21
+def encode_veh_ud(data, config_file_path=None):
+    if config_file_path:
+        config = configparser.ConfigParser()
+        config.read(config_file_path)
+
+        IND_POS = int(config.get("DATA", "IND_POS"))
+        IND_FID = int(config.get("DATA", "IND_FID"))
+        IND_CAM_ID = int(config.get("DATA", "IND_CAM_ID"))
+        IND_LANE_ID = int(config.get("DATA", "IND_LANE_ID"))
+        IND_US_FLAG = int(config.get("DATA", "IND_US_FLAG"))
+    else:
+        IND_POS = 5
+        IND_FID = 1
+        IND_CAM_ID = 2 # NGSIM from Lizhe
+        # IND_CAM_ID = 18 # for 3D LiDAR data
+        IND_LANE_ID = 13
+        IND_US_FLAG = 21
 
     camArr = np.array(())
     udArr = np.array(())
@@ -241,10 +252,10 @@ def encode_veh_ud(data):
 
 # Entry point of motion estimation
 # Perform motion estmation and trajectory fusing using RTS smoother
-def combine_cam_motion_est_ud(dataVeh):
+def combine_cam_motion_est_ud(dataVeh, config_file_path=None):
     dt = 0.1
     
-    posMat, lnArr, fidArr, _ = encode_veh_ud(dataVeh)
+    posMat, lnArr, fidArr, _ = encode_veh_ud(dataVeh, config_file_path=config_file_path)
     numCam = np.shape(posMat)[1]
     numFrame = len(fidArr)
     isDetection = np.logical_not(np.isnan(posMat))

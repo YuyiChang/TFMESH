@@ -1,5 +1,6 @@
 # ignore data folder
-data/
+data/*
+!data/README.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -155,3 +156,4 @@ cython_debug/
 #.idea/
 .DS_Store
 validation/Validation_Tool.prj
+
