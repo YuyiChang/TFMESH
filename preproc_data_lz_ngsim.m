@@ -1,7 +1,7 @@
 clc;clear
 
 
-in_data_version = 'v7_6_combined';
+in_data_version = 'v7_9_combined';
 in_dir = ['data' filesep in_data_version filesep];
 
 out_dir = ['data' filesep in_data_version '_preproc' filesep];

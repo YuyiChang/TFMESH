@@ -183,6 +183,7 @@ def encode_veh_ud(data, config_file_path=None):
         IND_CAM_ID = int(config.get("DATA", "IND_CAM_ID"))
         IND_LANE_ID = int(config.get("DATA", "IND_LANE_ID"))
         IND_US_FLAG = int(config.get("DATA", "IND_US_FLAG"))
+        IND_VEH_LEN = int(config.get("DATA", "IND_VEH_LEN"))
     else:
         IND_POS = 5
         IND_FID = 1
@@ -190,6 +191,13 @@ def encode_veh_ud(data, config_file_path=None):
         # IND_CAM_ID = 18 # for 3D LiDAR data
         IND_LANE_ID = 13
         IND_US_FLAG = 21
+        IND_VEH_LEN = 8
+
+    # get vehicle length
+    vehLen = np.unique(data[:, IND_VEH_LEN])
+    if len(vehLen) > 1:
+        vehLen = vehLen[0]
+        warnings.warn("Multiple vehicle length registered for vehicle.\n")
 
     camArr = np.array(())
     udArr = np.array(())
@@ -248,14 +256,14 @@ def encode_veh_ud(data, config_file_path=None):
             lnArr[i] = np.unique(lnMat[i,ind])
         else:
             lnArr[i] = lnArr[i-1]
-    return posMat, lnArr, fidArr, lnMat
+    return posMat, lnArr, fidArr, lnMat, vehLen
 
 # Entry point of motion estimation
 # Perform motion estmation and trajectory fusing using RTS smoother
 def combine_cam_motion_est_ud(dataVeh, config_file_path=None):
     dt = 0.1
     
-    posMat, lnArr, fidArr, _ = encode_veh_ud(dataVeh, config_file_path=config_file_path)
+    posMat, lnArr, fidArr, _, vehLen = encode_veh_ud(dataVeh, config_file_path=config_file_path)
     numCam = np.shape(posMat)[1]
     numFrame = len(fidArr)
     isDetection = np.logical_not(np.isnan(posMat))
@@ -289,6 +297,7 @@ def combine_cam_motion_est_ud(dataVeh, config_file_path=None):
     dataTemp[:,0] = dataVeh[0,0]
     dataTemp[:,1] = fidArr
     dataTemp[:,5] = xs_rts[:,0]
+    dataTemp[:,8] = vehLen
     dataTemp[:,11] = xs_rts[:,1]
     dataTemp[:,12] = xs_rts[:,2]
     dataTemp[:,13] = lnArr
