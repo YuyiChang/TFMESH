@@ -86,7 +86,14 @@ config_file_path = 'config/lidar.ini'
 > This should be done in preprocessing step, and a working example in this case can be found under `preproc_data_lz_ngsim.m`.
 
 
-## (For internal reference only) Function hierarchy
+## About
+
+[MIT License](LICENSE)
+
+Cite us: coming soon
+
+
+<!-- ## (For internal reference only) Function hierarchy
 
 As used in `main.ipynb`
 
@@ -107,5 +114,5 @@ As used in `main.ipynb`
     - index_true_region
     - index_stop_region
       - index_true_region
-    - spline_near_stop
+    - spline_near_stop -->
 
