@@ -6,7 +6,7 @@ This package performs the following tasks:
 
 - Basic I/O and processing
   - load trajectory in a close-to-NGSIM or customized format
-  - save trajectory data in NGSIM format
+  - save trajectory data in [NGSIM](https://ops.fhwa.dot.gov/trafficanalysistools/ngsim.htm) format
   - parallel process raw vehicle data
 - RTS Smoother
   - perform trajectory fusing if multiple observations are available
@@ -15,7 +15,6 @@ This package performs the following tasks:
 - RANSAC stop detection and handling
   - perform stop detection 
   - perform stop handling, including spline interpolation to connect moving and stopped parts
-
 
 ## Getting started
 
