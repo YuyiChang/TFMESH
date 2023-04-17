@@ -139,10 +139,10 @@ def ns_and_s_handle(dataVeh):
     indNeg = np.append(dataVeh[1:, 5] - dataVeh[:-1, 5] < 0, False)
     # find near-stop point
     # near-stop threshold = 4ft/s = 1.22 m/s
-    indNs = dataVeh[:,11] <= 4
+    indNs = dataVeh[:,11] <= 1.22
     # find stop point
     # stop threshold = 0.3ft/s = 0.09 m/s
-    indS = dataVeh[:,11] <= 0.3
+    indS = dataVeh[:,11] <= 0.05
     ### to form stop detection logic
     indStop  = indSame | indNeg | indS
 
