@@ -89,7 +89,18 @@ config_file_path = 'config/lidar.ini'
 
 [MIT License](LICENSE)
 
-Cite us: coming soon
+We kindly ask you to cite the following paper if you use our code in your publication
+```
+@article{chang2023using,
+  title={Using spatiotemporal stacks for precise vehicle tracking from roadside 3D LiDAR data},
+  author={Chang, Yuyi and Xiao, Wen and Coifman, Benjamin},
+  journal={Transportation research part C: emerging technologies},
+  volume={154},
+  pages={104280},
+  year={2023},
+  publisher={Elsevier}
+}
+```
 
 
 <!-- ## (For internal reference only) Function hierarchy
